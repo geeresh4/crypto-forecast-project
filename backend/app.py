@@ -9,17 +9,19 @@ import numpy as np
 from datetime import datetime, timedelta
 import requests
 
+# Standard library imports
+import pickle
+
 # Optional ML imports - handle gracefully if not available
 ML_AVAILABLE = False
 try:
-    import pickle
     from tensorflow.keras.models import load_model
     from sklearn.preprocessing import MinMaxScaler
     ML_AVAILABLE = True
 except ImportError:
     # ML dependencies not available - API will work without prediction features
     ML_AVAILABLE = False
-    import pickle  # pickle is in standard library, should always be available
+    print("Warning: ML dependencies (TensorFlow, scikit-learn) not available. Prediction features will be limited.")
 
 app = FastAPI()
 
