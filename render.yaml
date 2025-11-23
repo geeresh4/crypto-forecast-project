@@ -1,0 +1,27 @@
+services:
+  # Backend API Service
+  - type: web
+    name: crypto-forecast-api
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        value: 8000
+    healthCheckPath: /
+    plan: free
+
+  # Frontend Static Site (optional - can also use GitHub Pages)
+  - type: web
+    name: crypto-forecast-frontend
+    env: static
+    buildCommand: echo "No build needed"
+    staticPublishPath: ./frontend
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    plan: free
+

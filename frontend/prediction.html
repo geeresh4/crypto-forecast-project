@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictions - Crypto Forecast</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="animated-background"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo"><a href="index.html">Crypto Forecast</a></h1>
+            <div class="nav-buttons">
+                <a href="dashboard.html" class="btn btn-primary">Dashboard</a>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="prediction-container">
+            <h2>Generate Price Predictions</h2>
+            <div class="prediction-form">
+                <div class="form-group">
+                    <label for="coinSelect">Select Coin</label>
+                    <select id="coinSelect" name="coin">
+                        <option value="">Loading coins...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country (for currency conversion)</label>
+                    <input type="text" id="country" name="country" placeholder="e.g., US, UK, IN">
+                </div>
+                <button type="button" id="predictBtn" class="btn btn-primary btn-large">Generate Predictions</button>
+            </div>
+            <div id="predictionsResult" class="predictions-result">
+                <!-- Predictions will be displayed here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/prediction.js"></script>
+</body>
+</html>
+
