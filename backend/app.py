@@ -328,10 +328,11 @@ async def predict(request: PredictionRequest):
             scaler = pickle.load(f)
         
         # Check if pandas/numpy are available
+        # Check if pandas/numpy are available
         if not PANDAS_AVAILABLE:
             raise HTTPException(
                 status_code=503,
-                detail="Data processing libraries (pandas/numpy) are required for predictions."
+                detail="Data processing libraries (pandas/numpy) are required for predictions. Please install them first."
             )
         
         # Load historical data
