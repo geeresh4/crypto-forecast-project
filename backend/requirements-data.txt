@@ -1,0 +1,5 @@
+# Optional data processing libraries
+# Install these if you need pandas/numpy features
+pandas==2.0.3
+numpy==1.24.3
+

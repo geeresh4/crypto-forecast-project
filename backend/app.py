@@ -4,13 +4,20 @@ from pydantic import BaseModel
 from typing import Optional, List
 import json
 import os
-import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
 import requests
 
 # Standard library imports
 import pickle
+
+# Optional data processing libraries
+try:
+    import pandas as pd
+    import numpy as np
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    print("Warning: pandas/numpy not available. Some features may be limited.")
 
 # Optional ML imports - handle gracefully if not available
 ML_AVAILABLE = False
@@ -227,6 +234,33 @@ async def get_history(coin: str):
     if not os.path.exists(csv_path):
         raise HTTPException(status_code=404, detail=f"No data found for {coin}")
     
+    if not PANDAS_AVAILABLE:
+        # Fallback: read CSV manually without pandas
+        try:
+            history = []
+            with open(csv_path, 'r') as f:
+                lines = f.readlines()
+                # Skip header
+                data_lines = lines[1:][-30:]  # Last 30 lines
+                for line in data_lines:
+                    parts = line.strip().split(',')
+                    if len(parts) >= 2:
+                        try:
+                            date_str = parts[0].strip()
+                            price_str = parts[-3] if len(parts) > 3 else parts[1]
+                            history.append({
+                                "date": date_str.split()[0] if ' ' in date_str else date_str,
+                                "price": float(price_str) if price_str.replace('.', '').isdigit() else 0.0
+                            })
+                        except (ValueError, IndexError):
+                            continue
+            return {
+                "coin": coin,
+                "history": history[-30:]  # Ensure max 30
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error reading data: {str(e)}")
+    
     try:
         df = pd.read_csv(csv_path)
         df['date'] = pd.to_datetime(df['date'])
@@ -297,6 +331,12 @@ async def predict(request: PredictionRequest):
         csv_path = os.path.join(DATA_DIR, f"{coin}.csv")
         if not os.path.exists(csv_path):
             raise HTTPException(status_code=404, detail=f"No data found for {coin}")
+        
+        if not PANDAS_AVAILABLE or not np:
+            raise HTTPException(
+                status_code=503,
+                detail="Data processing libraries (pandas/numpy) are required for predictions."
+            )
         
         df = pd.read_csv(csv_path)
         df['date'] = pd.to_datetime(df['date'])
