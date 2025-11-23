@@ -327,16 +327,17 @@ async def predict(request: PredictionRequest):
         with open(scaler_path, 'rb') as f:
             scaler = pickle.load(f)
         
-        # Load historical data
-        csv_path = os.path.join(DATA_DIR, f"{coin}.csv")
-        if not os.path.exists(csv_path):
-            raise HTTPException(status_code=404, detail=f"No data found for {coin}")
-        
-        if not PANDAS_AVAILABLE or not np:
+        # Check if pandas/numpy are available
+        if not PANDAS_AVAILABLE:
             raise HTTPException(
                 status_code=503,
                 detail="Data processing libraries (pandas/numpy) are required for predictions."
             )
+        
+        # Load historical data
+        csv_path = os.path.join(DATA_DIR, f"{coin}.csv")
+        if not os.path.exists(csv_path):
+            raise HTTPException(status_code=404, detail=f"No data found for {coin}")
         
         df = pd.read_csv(csv_path)
         df['date'] = pd.to_datetime(df['date'])
