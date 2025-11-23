@@ -10,14 +10,16 @@ from datetime import datetime, timedelta
 import requests
 
 # Optional ML imports - handle gracefully if not available
+ML_AVAILABLE = False
 try:
     import pickle
     from tensorflow.keras.models import load_model
     from sklearn.preprocessing import MinMaxScaler
     ML_AVAILABLE = True
 except ImportError:
+    # ML dependencies not available - API will work without prediction features
     ML_AVAILABLE = False
-    print("Warning: ML dependencies not available. Prediction features will be limited.")
+    import pickle  # pickle is in standard library, should always be available
 
 app = FastAPI()
 
@@ -278,10 +280,12 @@ async def predict(request: PredictionRequest):
                 detail=f"Model not found for {coin}. Please train the model first."
             )
         
-        # Load model and scaler
-        from tensorflow.keras.models import load_model
-        import pickle
-        from sklearn.preprocessing import MinMaxScaler
+        # Load model and scaler (imports already checked at top)
+        if not ML_AVAILABLE:
+            raise HTTPException(
+                status_code=503,
+                detail="ML prediction features are not available. TensorFlow is not installed."
+            )
         
         model = load_model(model_path)
         with open(scaler_path, 'rb') as f:
