@@ -7,10 +7,17 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-import pickle
-from tensorflow.keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
 import requests
+
+# Optional ML imports - handle gracefully if not available
+try:
+    import pickle
+    from tensorflow.keras.models import load_model
+    from sklearn.preprocessing import MinMaxScaler
+    ML_AVAILABLE = True
+except ImportError:
+    ML_AVAILABLE = False
+    print("Warning: ML dependencies not available. Prediction features will be limited.")
 
 app = FastAPI()
 
@@ -246,6 +253,13 @@ async def predict(request: PredictionRequest):
     start = request.start
     end = request.end
     
+    # Check if ML dependencies are available
+    if not ML_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="ML prediction features are not available. TensorFlow is not installed. Please install ML dependencies or use a service with TensorFlow support."
+        )
+    
     try:
         # Parse dates
         start_date = datetime.strptime(start, '%Y-%m-%d')
@@ -265,6 +279,10 @@ async def predict(request: PredictionRequest):
             )
         
         # Load model and scaler
+        from tensorflow.keras.models import load_model
+        import pickle
+        from sklearn.preprocessing import MinMaxScaler
+        
         model = load_model(model_path)
         with open(scaler_path, 'rb') as f:
             scaler = pickle.load(f)
