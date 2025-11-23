@@ -3,11 +3,9 @@ services:
   - type: web
     name: crypto-forecast-api
     env: python
-    buildCommand: pip install --upgrade pip && pip install -r backend/requirements.txt
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r backend/requirements.txt
     startCommand: cd backend && uvicorn app:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
       - key: PORT
         value: 8000
     healthCheckPath: /
